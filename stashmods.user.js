@@ -26,7 +26,9 @@ function main () {
 		jQuery.get(apibase+'/tags', function(tagdata) {
 			var lookup = {};
 			for (var i=0,s=tagdata.values.length; i<s; i++) {
-				lookup[tagdata.values[i].latestChangeset] = tagdata.values[i].displayId;
+				var sha = tagdata.values[i].latestChangeset;
+				lookup[sha] = lookup[sha] || [];
+				lookup[sha].push(tagdata.values[i].displayId);
 			}
 			var observer = new MutationObserver(modTable);
 			modTable();
@@ -38,7 +40,14 @@ function main () {
 				tbl.find('.commit-row').each(function() {
 					var sha = jQuery(this).find('.changesetid').attr('href').replace(/^.*\/(\w+)\/?$/, '$1');
 					if (lookup[sha]) {
-						jQuery(this).find('.message span').prepend('<div style="float:right" class="ft-tag aui-lozenge">'+lookup[sha]+'</div>');
+						var span = jQuery(this).find('.message span');
+						if (lookup[sha].length === 1) {
+							span.prepend('<div style="float:right;" class="ft-tag aui-lozenge">'+lookup[sha][0]+'</div>');
+						} else {
+							lookup[sha].forEach(function _add(tag) {
+								span.after('<div style="float:right; margin: 2px;" class="ft-tag aui-lozenge">'+tag+'</div>');
+							});
+						}
 					}
 				});
 				tbl.find('th.author').html('');
