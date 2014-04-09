@@ -63,6 +63,7 @@ function main () {
 		avatarOnly();
 		function avatarOnly() {
 			observer.disconnect();
+			$('th.author').empty();
 			$('.avatar-with-name > .aui-avatar').each(function() {
 				$(this).parent().find('.secondary-link').empty().append(this);
 			});
