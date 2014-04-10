@@ -1,12 +1,4 @@
-// ==UserScript==
-// @name                Stash enhancements
-// @namespace	        http://labs.ft.com
-// @description	        Adds useful features to Stash
-// @include		        http://git.svc.ft.com/*
-// @include		        http://git.svc.ft.com:8080/*
-// ==/UserScript==
-
-function main () {
+function main() {
 
 	var apibase = location.pathname.replace(/^\/projects\/(\w+)\/repos\/([\w\-]+)(\/.*)?$/, '/rest/api/1.0/projects/$1/repos/$2');
 
@@ -34,7 +26,7 @@ function main () {
 			modTable();
 
 			function modTable() {
-				console.log('Modifying commit table');
+				console.log('Stashmods Chrome extension: Modifying commit table');
 				observer.disconnect();
 				jQuery('.ft-tag').remove();
 				tbl.find('.commit-row').each(function() {
@@ -56,16 +48,13 @@ function main () {
 			}
 		});
 	});
-
-
-
-
 }
 
-// Run the script in the main document context, not in the userscript sandbox
-var D = document;
-var scriptNode = D.createElement ('script');
-var targ = D.getElementsByTagName ('head')[0] || D.body || D.documentElement;
+// Run the script in the main document context, not in the extension sandbox
+var scriptNode = document.createElement('script');
+var target = document.getElementsByTagName('head')[0] || document.body || document.documentElement;
+
 scriptNode.type = "text/javascript";
-scriptNode.textContent  = '(' + main.toString() + ')()';
-targ.appendChild (scriptNode);
+scriptNode.textContent = '(' + main.toString() + ')()';
+
+target.appendChild(scriptNode);
