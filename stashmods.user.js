@@ -9,10 +9,7 @@ function main() {
 		jQuery.get('/account');
 	}, 120000);
 
-
-	/* Add tags to commit view */
-
-	jQuery(function() {
+	function addTags() {
 		var tbl = jQuery('table.commits-table');
 		if (!tbl.length) return;
 		jQuery.get(apibase+'/tags', function(tagdata) {
@@ -47,6 +44,24 @@ function main() {
 				observer.observe(tbl.get(0), {subtree: true, childList: true});
 			}
 		});
+	}
+
+	function addRedmineLinks() {
+		var commitMsgs = document.querySelectorAll('.commit-message');
+
+		for (var i = 0, l = commitMsgs.length; i < l; i++) {
+			var msg = commitMsgs[i];
+			msg.innerHTML = msg.innerHTML.replace(/(redmine\s*#?(\d+))/i, '<a href="https://redmine.labs.ft.com/issues/$2">$1</a>')
+		}
+	}
+
+	jQuery(function() {
+
+		// Add tags to commit view
+		addTags();
+
+		// Convert Redmine references to links
+		addRedmineLinks();
 	});
 }
 
