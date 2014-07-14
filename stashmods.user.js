@@ -1,12 +1,4 @@
-// ==UserScript==
-// @name                Stash enhancements
-// @namespace	        http://labs.ft.com
-// @description	        Adds useful features to Stash
-// @include		        http://git.svc.ft.com/*
-// @include		        http://git.svc.ft.com:8080/*
-// ==/UserScript==
-
-function main () {
+function main() {
 
 	var apibase = location.pathname.replace(/^\/projects\/(\w+)\/repos\/([\w\-]+)(\/.*)?$/, '/rest/api/1.0/projects/$1/repos/$2');
 	var $ = jQuery;
@@ -18,10 +10,7 @@ function main () {
 		$.get('/account');
 	}, 120000);
 
-
-	/* Add tags to commit view */
-
-	$(function() {
+	function addTags() {
 		var tbl = $('table.commits-table');
 		if (!tbl.length) return;
 		$.get(apibase+'/tags', function(tagdata) {
@@ -35,7 +24,7 @@ function main () {
 			modTable();
 
 			function modTable() {
-				console.log('Modifying commit table');
+				console.log('Stashmods Chrome extension: Modifying commit table');
 				observer.disconnect();
 				$('.ft-tag').remove();
 				tbl.find('.commit-row').each(function() {
@@ -54,11 +43,18 @@ function main () {
 				observer.observe(tbl.get(0), {subtree: true, childList: true});
 			}
 		});
-	});
+	}
 
+	function addRedmineLinks() {
+		var commitMsgs = document.querySelectorAll('.commit-message, .commit-row .message');
 
-	/* Remove author names - avatars are sufficient */
-	$(function() {
+		for (var i = 0, l = commitMsgs.length; i < l; i++) {
+			var msg = commitMsgs[i];
+			msg.innerHTML = msg.innerHTML.replace(/(redmine\s*#?(\d+))/i, '<a href="https://redmine.labs.ft.com/issues/$2">$1</a>')
+		}
+	}
+
+	function removeAuthorNames() {
 		var observer = new MutationObserver(avatarOnly);
 		avatarOnly();
 		function avatarOnly() {
@@ -69,17 +65,26 @@ function main () {
 			});
 			observer.observe(document.body, {subtree: true, childList: true});
 		}
+	}
+
+	$(function() {
+
+		// Add tags to commit view
+		addTags();
+
+		// Convert Redmine references to links
+		addRedmineLinks();
+
+		// Remove author names - avatars are sufficient
+		removeAuthorNames();
 	});
-
-
-
-
 }
 
-// Run the script in the main document context, not in the userscript sandbox
-var D = document;
-var scriptNode = D.createElement ('script');
-var targ = D.getElementsByTagName ('head')[0] || D.body || D.documentElement;
+// Run the script in the main document context, not in the extension sandbox
+var scriptNode = document.createElement('script');
+var target = document.getElementsByTagName('head')[0] || document.body || document.documentElement;
+
 scriptNode.type = "text/javascript";
-scriptNode.textContent  = '(' + main.toString() + ')()';
-targ.appendChild (scriptNode);
+scriptNode.textContent = '(' + main.toString() + ')()';
+
+target.appendChild(scriptNode);

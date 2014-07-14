@@ -1,0 +1,24 @@
+{
+	"manifest_version": 2,
+	"content_scripts": [
+		{
+			"js": [
+				"stashmods.user.js"
+			],
+			"matches": [
+				"http://git.svc.ft.com/*"
+			],
+			"run_at": "document_idle"
+		}
+	],
+	"icons": {
+		"48": "stash48.png",
+		"128": "stash128.png"
+	},
+	"name": "Stash enhancements",
+	"description": "Adds useful features to Stash",
+	"version": "1.1.1",
+	"web_accessible_resources": [
+		"/static/js/jquery-2.0.3.min.map"
+	]
+}
