@@ -1,18 +1,19 @@
 function main() {
 
 	var apibase = location.pathname.replace(/^\/projects\/(\w+)\/repos\/([\w\-]+)(\/.*)?$/, '/rest/api/1.0/projects/$1/repos/$2');
+	var $ = jQuery;
 
 	/* Keep me logged in! */
 
 	// Load the account page once every 2 minutes
 	setInterval(function() {
-		jQuery.get('/account');
+		$.get('/account');
 	}, 120000);
 
 	function addTags() {
-		var tbl = jQuery('table.commits-table');
+		var tbl = $('table.commits-table');
 		if (!tbl.length) return;
-		jQuery.get(apibase+'/tags', function(tagdata) {
+		$.get(apibase+'/tags', function(tagdata) {
 			var lookup = {};
 			for (var i=0,s=tagdata.values.length; i<s; i++) {
 				var sha = tagdata.values[i].latestChangeset;
@@ -25,11 +26,11 @@ function main() {
 			function modTable() {
 				console.log('Stashmods Chrome extension: Modifying commit table');
 				observer.disconnect();
-				jQuery('.ft-tag').remove();
+				$('.ft-tag').remove();
 				tbl.find('.commit-row').each(function() {
-					var sha = jQuery(this).find('.changesetid').attr('href').replace(/^.*\/(\w+)\/?$/, '$1');
+					var sha = $(this).find('.changesetid').attr('href').replace(/^.*\/(\w+)\/?$/, '$1');
 					if (lookup[sha]) {
-						var span = jQuery(this).find('.message span');
+						var span = $(this).find('.message span');
 						if (lookup[sha].length === 1) {
 							span.prepend('<div style="float:right;" class="ft-tag aui-lozenge">'+lookup[sha][0]+'</div>');
 						} else {
@@ -39,8 +40,6 @@ function main() {
 						}
 					}
 				});
-				tbl.find('th.author').html('');
-				tbl.find('.avatar-with-name').contents().filter(function() { return this.nodeType === 3; }).remove();
 				observer.observe(tbl.get(0), {subtree: true, childList: true});
 			}
 		});
@@ -55,13 +54,29 @@ function main() {
 		}
 	}
 
-	jQuery(function() {
+	function removeAuthorNames() {
+		var observer = new MutationObserver(avatarOnly);
+		avatarOnly();
+		function avatarOnly() {
+			observer.disconnect();
+			$('th.author').empty();
+			$('.avatar-with-name > .aui-avatar').each(function() {
+				$(this).parent().find('.secondary-link').empty().append(this);
+			});
+			observer.observe(document.body, {subtree: true, childList: true});
+		}
+	}
+
+	$(function() {
 
 		// Add tags to commit view
 		addTags();
 
 		// Convert Redmine references to links
 		addRedmineLinks();
+
+		// Remove author names - avatars are sufficient
+		removeAuthorNames();
 	});
 }
 
