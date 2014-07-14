@@ -46,7 +46,7 @@ function main() {
 	}
 
 	function addRedmineLinks() {
-		var commitMsgs = document.querySelectorAll('.commit-message');
+		var commitMsgs = document.querySelectorAll('.commit-message, .commit-row .message');
 
 		for (var i = 0, l = commitMsgs.length; i < l; i++) {
 			var msg = commitMsgs[i];
