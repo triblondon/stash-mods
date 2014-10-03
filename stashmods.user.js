@@ -46,11 +46,11 @@ function main() {
 	}
 
 	function addRedmineLinks() {
-		var commitMsgs = document.querySelectorAll('.commit-message, .commit-row .message');
+		var commitMsgs = document.querySelectorAll('.commit-message, .commit-row .message, h2.title, .branch .name');
 
 		for (var i = 0, l = commitMsgs.length; i < l; i++) {
 			var msg = commitMsgs[i];
-			msg.innerHTML = msg.innerHTML.replace(/(redmine\s*#?(\d+))/i, '<a href="https://redmine.labs.ft.com/issues/$2">$1</a>')
+			msg.innerHTML = msg.innerHTML.replace(/(redmine\s*#?(\d+))/ig, '<a href="https://redmine.labs.ft.com/issues/$2">$1</a>')
 		}
 	}
 
